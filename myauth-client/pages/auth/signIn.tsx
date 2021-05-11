@@ -1,23 +1,10 @@
+import Link from "next/link";
 import * as React from "react";
+import {GetServerSideProps} from "next";
+import {csrfToken, getSession, providers} from "next-auth/client";
 
-const Login = () => {
+const Login = ({ providers, csrfToken }: any) => {
     return (
-    /*
-      This example requires Tailwind CSS v2.0+
-
-      This example requires some changes to your config:
-
-      ```
-      // tailwind.config.js
-      module.exports = {
-        // ...
-        plugins: [
-          // ...
-          require('@tailwindcss/forms'),
-        ]
-      }
-      ```
-    */
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center pt-4 pb-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <img
@@ -30,7 +17,8 @@ const Login = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form className="space-y-6" action="#" method="POST">
+                    <form className="space-y-6" action="/api/auth/callback/credentials" method="POST">
+                        <input name='csrfToken' type='hidden' defaultValue={csrfToken}/>
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                 Email address
@@ -151,8 +139,36 @@ const Login = () => {
                     </div>
                 </div>
             </div>
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <p className="mt-2 text-center text-base font-medium text-gray-600">
+                    Go back to
+                    <Link href='/'>
+                        <a className="underline cursor-pointer hover:text-gray-800"> Home</a>
+                    </Link>
+                </p>
+            </div>
         </div>
     );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { req, res } = context;
+    const session = await getSession({ req });
+
+    if (session && res && session.accessToken) {
+        res.writeHead(302, {
+            Location: "/member",
+        });
+        res.end();
+        return;
+    }
+
+    return {
+        props: {
+            providers: await providers(),
+            csrfToken: await csrfToken(context),
+        }
+    };
+};
 
 export default Login;
