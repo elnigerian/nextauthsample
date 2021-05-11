@@ -31,6 +31,7 @@ yarn-error.log*
 # Webstorm
 ../.idea/shelf
 .idea/workspace.xml
+../.idea/**
 
 
 # Docker

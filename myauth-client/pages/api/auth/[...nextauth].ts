@@ -1,12 +1,35 @@
 import NextAuth, {NextAuthOptions} from 'next-auth';
 import Providers from "next-auth/providers";
+import {findUserByEmailAddress} from "../../../lib";
 
-const authOptions: any = {
+const authOptions: NextAuthOptions = {
     providers: [
-        Providers.GitHub({
-        clientId: process.env.GITHUB_ID,
-        clientSecret: process.env.GITHUB_SECRET,
-        }),
+        // Providers.GitHub({
+        // clientId: process.env.GITHUB_ID,
+        // clientSecret: process.env.GITHUB_SECRET,
+        // }),
+        Providers.Credentials({
+            name: 'Credentials',
+            credentials: {
+                email: { label: "Email Address", type: "email", placeholder: "john.doe@example.com"},
+                password: { label: "Password", type: "password", placeholder: "Your super secure password" }
+            },
+            async authorize(credentials: any) {
+                let emailAddress = credentials.email;
+                const user = await findUserByEmailAddress(emailAddress);
+
+                if (!user) {
+                    throw new Error('No user found');
+                }
+                // const isValid = await verifyPassword(credentials.password, user.password);
+
+                // if (!isValid) {
+                //     throw new Error('Incorrect password');
+                // }
+
+                return {id: user.id, username: user.username, email: user.emailAddress, name: user.firstName};
+            }
+        })
     ],
 
     // The secret should be set to a reasonably long random string.
@@ -20,7 +43,7 @@ const authOptions: any = {
         jwt: true,
 
         // Seconds - How long until an idle session expires and is no longer valid.
-        // maxAge: 30 * 24 * 60 * 60, // 30 days
+        maxAge: 30 /** 24 * 60 * 60*/, // 30 days
 
         // Seconds - Throttle how frequently to write to database to extend a session.
         // Use it to limit write operations. Set to 0 to always update the database.
@@ -47,8 +70,8 @@ const authOptions: any = {
     // pages is not specified for that route.
     // https://next-auth.js.org/configuration/pages
     pages: {
-        // signIn: '/auth/signin',  // Displays signin buttons
-        // signOut: '/auth/signout', // Displays form with sign out button
+        //signIn: '/auth/signin',  // Displays signin buttons
+        signOut: '/auth/signout', // Displays form with sign out button
         // error: '/auth/error', // Error code passed in query string as ?error=
         // verifyRequest: '/auth/verify-request', // Used for check email page
         // newUser: null // If set, new users will be directed here on first sign in

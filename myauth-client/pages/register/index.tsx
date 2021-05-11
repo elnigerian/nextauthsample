@@ -1,5 +1,6 @@
 import * as React from "react";
 import Layout from "@/components/layout/layout";
+import Link from "next/link";
 
 const Register = () => {
     return (
@@ -75,6 +76,14 @@ const Register = () => {
                         </div>
                     </form>
                 </div>
+            </div>
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <p className="mt-2 text-center text-base font-medium text-gray-600">
+                    Go back to
+                    <Link href='/'>
+                        <a className="underline cursor-pointer hover:text-gray-800"> Home</a>
+                    </Link>
+                </p>
             </div>
         </div>
     );

@@ -1,14 +1,17 @@
 import * as React from "react";
 import Link from 'next/link';
 import {useRouter} from "next/router";
+import {useSession, signOut} from "next-auth/client";
+import _ from 'lodash';
 
 const defaultNavMenuCollection = [
     {item: 'Products', slug: 'products', url: '/products', asUrl: '/products', theme: 'default', active: true, role: 'link'},
     {item: 'How It Works', slug: 'how-it-works', url: '/how-it-works', asUrl: '/how-it-works', theme: 'default', active: true, role: 'link'},
     {item: 'Features', slug: 'features', url: '/features', asUrl: '/features', theme: 'default', active: true, role: 'link'},
     {item: 'Marketplace', slug: 'marketplace', url: '/marketplace', asUrl: '/marketplace', theme: 'default', active: true, role: 'link'},
-    {item: 'Company', slug: 'company', url: '/company', asUrl: '/company', theme: 'default', active: true, role: 'link'},
-    {item: 'Login', slug: 'login', url: '/auth/login', asUrl: '/login', theme: 'default', active: true, role: 'button'},
+    {item: 'Members', slug: 'member', url: '/member', asUrl: '/member', theme: 'default', active: true, role: 'link'},
+    {item: 'Login', slug: 'signIn', url: '/auth/signIn', asUrl: '/signIn', theme: 'default', active: false, role: 'button'},
+    {item: 'Logout', slug: 'signOut', url: '/auth/signOut', asUrl: '/signOut', theme: 'default', active: false, role: 'button'},
     {item: 'Get Started', slug: 'get-started', url: '/register', asUrl: '/register', theme: 'primary', active: true, role: 'button'},
 ];
 
@@ -18,6 +21,23 @@ type NavBarProps =  {
 
 const DesktopNav: React.FunctionComponent<NavBarProps> = ({navMenuItems= defaultNavMenuCollection}) => {
     const router = useRouter();
+    const [session, loading] = useSession();
+    const [navMenuButtons, setNavMenuButtons] = React.useState([]);
+    const [navMenuLinks, setNavMenuLinks] = React.useState([]);
+
+    React.useEffect(() => {
+        if(navMenuItems && navMenuItems.length > 0 ) {
+            if (session) {
+                const navButtons =  _.filter(navMenuItems, (item) => item.slug !== 'login' && item.role === 'button');
+                setNavMenuButtons(navButtons);
+            } else {
+                const buttons =  _.filter(navMenuItems, (item) => item.slug !== 'logout' && item.role === 'button');
+                setNavMenuButtons(buttons);
+            }
+            const navLinks = _.filter(navMenuItems, (item) =>  item.role === 'link');
+            setNavMenuLinks(navLinks);
+        }
+    }, [navMenuItems, session]);
 
     return (
         <div>
@@ -32,7 +52,7 @@ const DesktopNav: React.FunctionComponent<NavBarProps> = ({navMenuItems= default
                     </div>
                     <div className='ml-12 flex flex-row flex-no-wrap justify-between space-x-4 font-medium text-lg text-gray-900'>
                         {
-                            navMenuItems && navMenuItems.length > 0 && navMenuItems.map((menu: any, index: any) => {
+                            navMenuLinks && navMenuLinks.length > 0 && navMenuLinks.map((menu: any, index: any) => {
                                 const {item, url, asUrl, slug, active, role} = menu;
                                 if (active && role === 'link') {
                                     return (
@@ -48,8 +68,9 @@ const DesktopNav: React.FunctionComponent<NavBarProps> = ({navMenuItems= default
                     </div>
                 </div>
                 <div className='mx-10 flex flex-row flex-no-wrap justify-between space-x-5'>
+                    <>
                     {
-                        navMenuItems && navMenuItems.length > 0 && navMenuItems.map((menu: any, index: any) => {
+                        navMenuButtons && navMenuButtons.length > 0 && navMenuButtons.map((menu: any, index: any) => {
                             const {item, url, asUrl, slug, active, role, theme} = menu;
                             if (active && role === 'button') {
                                 return (
@@ -63,6 +84,26 @@ const DesktopNav: React.FunctionComponent<NavBarProps> = ({navMenuItems= default
                             }
                         })
                     }
+                    </>
+                    <>
+                        {
+                            session ? (
+                                    <div key={'logout'}>
+                                        <button className={`w-48 h-12 cursor-pointer border-4 border-solid border-gray-600 rounded focus:outline-none`}
+                                                onClick={() => signOut({ redirect: true, callbackUrl: "/" })}>
+                                            <a className={` text-center font-bold text-f7`}>Logout </a>
+                                        </button>
+                                    </div>
+                            ) : (
+                                <div key={'login'}>
+                                    <button className={`w-48 h-12 cursor-pointer border-4 border-solid border-gray-600 rounded focus:outline-none`}
+                                            onClick={() => router.push( '/auth/signIn')}>
+                                        <a className={` text-center font-bold text-f7`}>Login </a>
+                                    </button>
+                                </div>
+                            )
+                        }
+                    </>
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@ import * as React from "react";
 import {GetServerSideProps} from "next";
 import {csrfToken, getSession, providers} from "next-auth/client";
 
-const Login = ({ providers, csrfToken }: any) => {
+const SignIn = ({ providers, csrfToken }: any) => {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col justify-center pt-4 pb-12 sm:px-6 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -171,4 +171,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-export default Login;
+export default SignIn;
