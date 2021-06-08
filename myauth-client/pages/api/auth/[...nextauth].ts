@@ -1,6 +1,8 @@
 import NextAuth, {NextAuthOptions} from 'next-auth';
-import Providers from "next-auth/providers";
-import {findUserByEmailAddress} from "../../../lib";
+import Providers from 'next-auth/providers';
+import {getErrorMessage} from '../../../lib/getGQLErrorMessage';
+import {SignInDocument} from "../../../generated/apolloComponents";
+import {initializeApollo} from "../../../apollo/client";
 
 const authOptions: NextAuthOptions = {
     providers: [
@@ -9,25 +11,48 @@ const authOptions: NextAuthOptions = {
         // clientSecret: process.env.GITHUB_SECRET,
         // }),
         Providers.Credentials({
+            id: 'credentials',
             name: 'Credentials',
+            type: "credentials",
             credentials: {
                 email: { label: "Email Address", type: "email", placeholder: "john.doe@example.com"},
-                password: { label: "Password", type: "password", placeholder: git "Your super secure password" }
+                // todo - mask password; appears visible on credentials object
+                password: { label: "Password", type: "password", placeholder: "Your super secure password" }
             },
             async authorize(credentials: any) {
+                const client = initializeApollo();
                 let emailAddress = credentials.email;
-                const user = await findUserByEmailAddress(emailAddress);
+                let password = credentials.password;
 
-                if (!user) {
-                    throw new Error('No user found');
+                try {
+                    await client.resetStore();
+                    const {data} = await client.mutate({
+                        mutation: SignInDocument,
+                        variables: {
+                            username: emailAddress,
+                            password
+                        }
+                    });
+                    console.log(`The result returned`, JSON.stringify(data, null, 2));
+                    if ( !data && !data.signIn ) {
+                        return null;
+                    }
+                    const user = data.signIn;
+                    // const user = await findUserByEmailAddress(emailAddress);
+                    console.log(`The user returned`, JSON.stringify(user, null, 2));
+                    if (!user) {
+                        return null;
+                    }
+                    console.log(`The user returned`, JSON.stringify(user, null, 2));
+                    // const isValid = await verifyPassword(credentials.password, user.password);
+
+                    // if (!isValid) {
+                    //     throw new Error('Incorrect password');
+                    // }
+                    return user; // {id: user.id, username: user.username, email: user.emailAddress, name: user.firstName};
+                } catch (error: any) {
+                    console.error(getErrorMessage(error))
                 }
-                // const isValid = await verifyPassword(credentials.password, user.password);
-
-                // if (!isValid) {
-                //     throw new Error('Incorrect password');
-                // }
-
-                return {id: user.id, username: user.username, email: user.emailAddress, name: user.firstName};
             }
         })
     ],
@@ -48,16 +73,16 @@ const authOptions: NextAuthOptions = {
         // Seconds - Throttle how frequently to write to database to extend a session.
         // Use it to limit write operations. Set to 0 to always update the database.
         // Note: This option is ignored if using JSON Web Tokens
-        // updateAge: 24 * 60 * 60, // 24 hours
+        updateAge: 24 /** * 60 * 60 */, // 24 hours
     },
     // JSON Web tokens are only used for sessions if the `jwt: true` session
     // option is set - or by default if no database is specified.
     // https://next-auth.js.org/configuration/options#jwt
     jwt: {
         // A secret to use for key generation (you should set this explicitly)
-        // secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
+        secret: 'INp8IvdIyeMcoGAgFGoA61DdBglwwSqnXJZkgz8PSnw',
         // Set to true to use encryption (default: false)
-        // encryption: true,
+        encryption: true,
         // You can define your own encode/decode functions for signing and encryption
         // if you want to override the default behaviour.
         // encode: async ({ secret, token, maxAge }) => {},
@@ -70,8 +95,8 @@ const authOptions: NextAuthOptions = {
     // pages is not specified for that route.
     // https://next-auth.js.org/configuration/pages
     pages: {
-        //signIn: '/auth/signin',  // Displays signin buttons
-        signOut: '/auth/signout', // Displays form with sign out button
+        signIn: '/auth/signIn',  // Displays sign in buttons
+        signOut: '/auth/signOut', // Displays form with sign out button
         // error: '/auth/error', // Error code passed in query string as ?error=
         // verifyRequest: '/auth/verify-request', // Used for check email page
         // newUser: null // If set, new users will be directed here on first sign in
@@ -92,7 +117,7 @@ const authOptions: NextAuthOptions = {
     events: {},
 
     // Enable debug messages in the console if you are having problems
-    debug: false,
+    debug: true,
 }
 
 

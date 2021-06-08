@@ -8,7 +8,7 @@ type MemberProps = {
     options?: any;
 }
 
-const Member: React.FunctionComponent<MemberProps> = ({contentMessage = 'This is the default message!'}) => {
+const Members: React.FunctionComponent<MemberProps> = ({contentMessage = 'This is the default message!'}) => {
     const [ session, loading ] = useSession()
     const [ content , setContent ] = React.useState()
 
@@ -29,10 +29,12 @@ const Member: React.FunctionComponent<MemberProps> = ({contentMessage = 'This is
     if (!session) { return  <Layout><AccessDenied/></Layout> }
     return (
         <Layout>
-            <h1>Protected Page</h1>
-            <p>{content}</p>
+            <div className='w-11/12 mx-auto my-10'>
+                <h1>Protected Page</h1>
+                <p>{content}</p>
+            </div>
         </Layout>
     )
 }
 
-export default Member;
+export default Members;

@@ -14,7 +14,7 @@ const Layout: React.FunctionComponent<LayoutProps> = ({children}: any) => {
         <div>
             <Header />
             <StatusBar />
-            <div className='container mx-auto my-4 flex flex-col'>
+            <div className=' xl:container mx-auto my-4 flex flex-col'>
                 <DesktopNav />
                 <div className='flex-grow'>
                     {children}

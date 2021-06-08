@@ -5,11 +5,12 @@ import {useSession, signOut} from "next-auth/client";
 import _ from 'lodash';
 
 const defaultNavMenuCollection = [
-    {item: 'Products', slug: 'products', url: '/products', asUrl: '/products', theme: 'default', active: true, role: 'link'},
-    {item: 'How It Works', slug: 'how-it-works', url: '/how-it-works', asUrl: '/how-it-works', theme: 'default', active: true, role: 'link'},
-    {item: 'Features', slug: 'features', url: '/features', asUrl: '/features', theme: 'default', active: true, role: 'link'},
-    {item: 'Marketplace', slug: 'marketplace', url: '/marketplace', asUrl: '/marketplace', theme: 'default', active: true, role: 'link'},
-    {item: 'Members', slug: 'member', url: '/member', asUrl: '/member', theme: 'default', active: true, role: 'link'},
+    {item: 'How It Works', slug: 'how-it-works', url: '/how-it-works', asUrl: '/how-it-works', theme: 'default', active: true, role: 'link', authenticationRequired: false },
+    {item: 'Features', slug: 'features', url: '/features', asUrl: '/features', theme: 'default', active: false, role: 'link', authenticationRequired: false},
+    {item: 'Marketplace', slug: 'marketplace', url: '/marketplace', asUrl: '/marketplace', theme: 'default', active: false, role: 'link', authenticationRequired: false},
+    {item: 'Products', slug: 'products', url: '/products', asUrl: '/products', theme: 'default', active: true, role: 'link', authenticationRequired: false},
+    {item: 'Members', slug: 'members', url: '/members', asUrl: '/members', theme: 'default', active: true, role: 'link', authenticationRequired: false},
+    {item: 'Users', slug: 'users', url: '/users', asUrl: '/users', theme: 'default', active: true, role: 'link', authenticationRequired: true},
     {item: 'Login', slug: 'signIn', url: '/auth/signIn', asUrl: '/signIn', theme: 'default', active: false, role: 'button'},
     {item: 'Logout', slug: 'signOut', url: '/auth/signOut', asUrl: '/signOut', theme: 'default', active: false, role: 'button'},
     {item: 'Get Started', slug: 'get-started', url: '/register', asUrl: '/register', theme: 'primary', active: true, role: 'button'},
@@ -27,14 +28,16 @@ const DesktopNav: React.FunctionComponent<NavBarProps> = ({navMenuItems= default
 
     React.useEffect(() => {
         if(navMenuItems && navMenuItems.length > 0 ) {
+            const navLinks = _.filter(navMenuItems, (item) =>  item.role === 'link' && !item.authenticationRequired);
             if (session) {
                 const navButtons =  _.filter(navMenuItems, (item) => item.slug !== 'login' && item.role === 'button');
                 setNavMenuButtons(navButtons);
+                const authLinks = _.filter(navMenuItems, (item) =>  item.role === 'link' && item.authenticationRequired)
+                navLinks.push(...authLinks);
             } else {
                 const buttons =  _.filter(navMenuItems, (item) => item.slug !== 'logout' && item.role === 'button');
                 setNavMenuButtons(buttons);
             }
-            const navLinks = _.filter(navMenuItems, (item) =>  item.role === 'link');
             setNavMenuLinks(navLinks);
         }
     }, [navMenuItems, session]);
@@ -43,7 +46,7 @@ const DesktopNav: React.FunctionComponent<NavBarProps> = ({navMenuItems= default
         <div>
             <div className='my-2 flex flex-row flex-no-wrap items-center justify-between'>
                 <div className='flex flex-row flex-no-wrap items-end justify-between'>
-                    <div className='mx-10'>
+                    <div className='mx-4 xl:mx-10'>
                         {''}
                         <Link href={{pathname: '/'}}>
                             <a><img className="h-6 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-teal-200-cyan-400.svg" alt=""/> </a>
