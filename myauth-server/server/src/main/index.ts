@@ -5,6 +5,7 @@ import cors from 'cors';
 import {ApolloServer} from "apollo-server-express";
 import {createSchema} from "./utils/schema";
 import {typeOrmConnection} from "./utils/typeOrmConnection";
+import {seedDatabase} from "./utils/seedDB";
 
 
 const main = async () => {
@@ -40,7 +41,10 @@ const main = async () => {
 
     apolloServer.applyMiddleware({ app, cors: false });
 
-    app.listen(process.env.GRAPHQL_PORT, async () => { console.log(`server started on port ${process.env.GRAPHQL_PORT}`)});
+    app.listen(process.env.GRAPHQL_PORT, async () => {
+        await seedDatabase();
+        console.log(`server started on port ${process.env.GRAPHQL_PORT}`);
+    });
 }
 
 main().catch((err) => console.error(err));

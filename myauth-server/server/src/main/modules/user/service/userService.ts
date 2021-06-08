@@ -1,10 +1,10 @@
-import {Service} from "typedi";
-import {User} from "../../../entity/user";
-import {getConnection} from "typeorm";
-import {UserInputType} from "../input-types/userInputType";
+import { Service } from 'typedi';
+import {User} from '../../../entity/user';
+import {getConnection} from 'typeorm';
+import {UserInputType} from '../input-types/userInputType';
 
 @Service('USER_SERVICE')
-class UserService {
+export default class UserService {
     async findUser(searchDetails: UserInputType): Promise<User[] | null> {
         return getConnection().manager.getRepository(User).find({
             where: {
@@ -19,7 +19,15 @@ class UserService {
      *
      */
     async findAllUsers(): Promise<User[] | []> {
-        return getConnection().manager.getRepository(User).find().catch(() => []);
+        return getConnection().manager.getRepository(User)
+            .find()
+            .then((results: any) => {
+                if(!results) {
+                    return []
+                }
+                return results;
+            })
+            .catch(() => []);
     }
 
     /**
@@ -32,6 +40,15 @@ class UserService {
             }
         }).catch(() => null);
     }
-}
 
-export default UserService;
+    /**
+     *
+     */
+    async findUserByUsername(username: string): Promise<User | null> {
+        return getConnection().manager.getRepository(User).findOne({
+            where : {
+                username
+            }
+        }).catch(() => null);
+    }
+};

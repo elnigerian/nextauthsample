@@ -16,10 +16,10 @@ const Hero = ({
                 <div className='w-7/12 p-4 flex flex-col flex-no-wrap justify-center'>
                     <div className='ml-12 flex flex-col flex-no-wrap items-start justify-start'>
                         <div className='w-10/12 min-w-1/2'>
-                            <p className='font-bold text-6xl text-gray-800'>{title} </p>
+                            <p className='font-bold text-4xl xl:text-6xl text-gray-800'>{title} </p>
                         </div>
                         <div className='w-10/12 my-4 py-2'>
-                            <p className='font-medium text-4xl text-gray-500'> {content} </p>
+                            <p className='font-medium text-2xl xl:text-4xl text-gray-500'> {content} </p>
                         </div>
                         <div>
                             {

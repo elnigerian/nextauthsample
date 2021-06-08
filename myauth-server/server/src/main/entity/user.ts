@@ -18,16 +18,27 @@ export class User extends BaseAuthEntity {
     username: string;
 
     @Field()
+    @Column()
+    firstName: string;
+
+    @Field()
+    @Column()
+    lastName: string;
+
+    @Field()
     @Index('emailAddress')
     @Column('text', {unique: true})
     emailAddress: string;
 
     @Field()
-    @Column('text')
+    @Column('text', {nullable: true})
     image: string;
 
     @Column()
     password: string;
+
+    @Column()
+    salt: string;
 
     @Field()
     @Column('bool', {default: false})
@@ -36,7 +47,7 @@ export class User extends BaseAuthEntity {
     @Column('int', {default: 0})
     tokenVersion: number;
 
-    @Field()
+    @Field({nullable: true})
     @Column({type: 'timestamp', nullable: true})
     email_verified: Date;
 }

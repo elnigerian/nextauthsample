@@ -6,4 +6,7 @@ module.exports = {
         NEXT_AUTH_SECRET: process.env.NEXT_AUTH_SECRET,
         NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     },
+    future: {
+        webpack5: true,
+    },
 }

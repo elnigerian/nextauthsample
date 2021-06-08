@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 type User = {
-    id?: any
+    id?: any;
     username: string;
     password?: string;
     firstName: string;
@@ -27,15 +27,16 @@ const users: User[] = [
         id: 3,
         username: "Q",
         firstName: "Q",
-        lastName: "",
+        lastName: "Queue",
         emailAddress: "q@mi6.co.uk"
     },
 
 ]
 
 const findUserByEmailAddress: any = async (emailAddress: string) => _.filter(users, (user: any) => user.emailAddress === emailAddress)[0];
+const findUserByUsername: any = async (username: string) => _.filter(users, (user: any) => user.username === username)[0];
 const findUserByFirstName: any = async (first: string) => _.filter(users, (user: any) => user.firstName === first)[0];
 const findUserByLastName: any = async (last: string) => _.filter(users, (user: any) => user.lastName === last)[0];
 
 
-export { users, findUserByEmailAddress, findUserByFirstName, findUserByLastName};
+export { users, findUserByEmailAddress, findUserByUsername, findUserByFirstName, findUserByLastName};
