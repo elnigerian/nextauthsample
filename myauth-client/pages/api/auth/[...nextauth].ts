@@ -12,7 +12,7 @@ const authOptions: NextAuthOptions = {
             name: 'Credentials',
             credentials: {
                 email: { label: "Email Address", type: "email", placeholder: "john.doe@example.com"},
-                password: { label: "Password", type: "password", placeholder: "Your super secure password" }
+                password: { label: "Password", type: "password", placeholder: git "Your super secure password" }
             },
             async authorize(credentials: any) {
                 let emailAddress = credentials.email;
